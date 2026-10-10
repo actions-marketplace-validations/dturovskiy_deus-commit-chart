@@ -45,7 +45,7 @@
 - [x] **DC-G2-08** Retain immutable build artifacts and previous manifest sufficient to restore an earlier verified release. (Verified test-remote restore from earlier manifest and artifact history; 90-day GitHub build-artifact retention.)
 - [x] **DC-G2-09** Rehearse rollback and verify restored content hashes in a nonproduction environment. (Smoke run 38086628526, isolated bare Git remote; manifest and all four assets byte-for-byte matched.)
 - [x] **DC-G2-10** Scope `contents: write` and publishing credentials to the minimum necessary permissions; protect secrets from logs.
-- [ ] **DC-G2-11** Add freshness health/failure reporting with an explicit configurable policy; separately document profile image-cache limitations.
+- [x] **DC-G2-11** Add freshness health/failure reporting with an explicit configurable policy; separately document profile image-cache limitations. (Scheduled health workflow; tested failure policy in 27-test suite; production healthy-run 38086854207. Live incident notification delivery remains untested.)
 - [ ] **DC-G2-12** Measure actual GitHub README embed lag and caching behavior; do not claim instantaneous invalidation without evidence.
 
 **Gate 2 exit:** every publication is validated, traceable, recoverable and capable of flagging stale data.
@@ -126,6 +126,14 @@
 - [GraphQL build 38086631846](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38086631846) passed on feature branch with publish job skipped.
 - Monitor checks the published `activity-assets` tree, not the source repo, with an **8-hour** threshold and deduplicated issue-creation/closure on error/recovery. Issue-delivery/production incident lifecycle and image proxy cache measurements are still open until independently observed.
 
+## Production Freshness & Recovery verification (2026-10-10)
+
+- [PR #3](https://github.com/dturovskiy/deus-commit-chart/pull/3) merged as `de1b8c8495d46b4a919c3c21c191a94079005fd6`.
+- [Production publish 38086821217](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38086821217) **SUCCESS**, [main smoke 38086821198](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38086821198) **SUCCESS**.
+- [Real health monitor 38086854207](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38086854207) **SUCCESS**: verified published manifest + all four artifact checksums and numerical totals + three SVG XML files; snapshot `f802e610b1d2d6abac963700adc140672c9c250b48ff0f29e9abda173f361195`, generated `2026-10-10T21:14:08.878Z`, age `0.00823h` (approx. 30s) at the check, threshold 8h.
+- GitHub Issues are enabled and no open issues existed at healthy-run time. Actual incident-creation/notification on a production failure was **not intentionally triggered**.
+- QA only: [branch smoke 38086628526](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38086628526) proved corrupt candidate rejected without test-remote ref mutation and full forward-only manifest/asset restoration. GitHub image-proxy freshness remains an independent open task.
+
 ## Evidence log (fill as work progresses)
 
 | Date / change | Finding or gate | Test / run / SHA / link | Result / notes |
@@ -141,7 +149,7 @@
 | 2026-10-10 PR | Deployment review | [Draft PR #1](https://github.com/dturovskiy/deus-commit-chart/pull/1) | Created using DEUS MCP GitHub CLI, mergeable; PR smoke check SUCCESS. Branch production publish guard was SKIPPED during test run. |
 | 2026-10-10 merged | Gate 5 release | [PR #1](https://github.com/dturovskiy/deus-commit-chart/pull/1), `main=7a76e17` | Merged via DEUS MCP gh CLI. Production [Publish 38083440184](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38083440184) and [Smoke 38083440198](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38083440198) both SUCCESS. |
 | 2026-10-10 prod proof | DC-G5-03 | `origin/activity-assets=766cafd`, `manifest.json`, `index.html`, 3 SVGs (DEUS MCP git fetch/show) | Snapshot `abdaa5a4c4ee4194f8fea7ca90e875d871801d0722328e21272773ce9e29afa0`, generated 20:21:46Z, current day 24, 30d=206, 90d=767, 365d=3052; manifest and all 4 outputs agreed; no output truncation. New branch commit parent `b530710`. |
-| — | Remaining open gates | [OPERATIONS.md](OPERATIONS.md) | Cache measurements, freshness alerting, public metadata decision, rollback rehearsal and real README image-cache inspection remain open. |
+| — | Current open gates | [OPERATIONS.md](OPERATIONS.md) | Image-proxy cache measurements, full public metadata policy, responsive visual QA, and live incident notification delivery remain open. Rehearsed rollback and published-asset freshness checks are evidenced above. |
 | — | — | — | — |
 
 ## Working conventions

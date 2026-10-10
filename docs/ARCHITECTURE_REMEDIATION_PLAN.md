@@ -192,7 +192,7 @@ All gates in [REMEDIATION_CHECKLIST.md](REMEDIATION_CHECKLIST.md) are complete w
 - DEUS MCP project runtime reports `package_manager_binary_missing`; Node validation was performed on a GitHub Actions Node 22 runner dispatched and examined **only through DEUS MCP**.
 - **Additional verified CI:** [Smoke 38083228821](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38083228821) and [real GraphQL build 38083244351](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38083244351) both succeeded on commit `b9af864`, including standalone Python-standard-library XML validation for all three SVGs. [Draft PR #1](https://github.com/dturovskiy/deus-commit-chart/pull/1) is mergeable; PR smoke check succeeded.
 - **Production verified:** [PR #1](https://github.com/dturovskiy/deus-commit-chart/pull/1) merged as `7a76e17`. [Publish 38083440184](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38083440184) and [Smoke 38083440198](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38083440198) both SUCCESS. `activity-assets` now at `766cafd` with parent `b530710` (forward history; not force-pushed). Independent DEUS MCP `git show` confirmed a published HTML and all 30/90/365 SVGs agree with manifest snapshot `abdaa5a4c4ee4194f8fea7ca90e875d871801d0722328e21272773ce9e29afa0` (2026-10-10T20:21:46.111Z); totals 206/767/3052, 2026-10-10=24 at snapshot time.
-- **Still open:** freshness alerts and cache observability, public privacy metadata policy, rollback rehearsal and direct README image-cache inspection. Operator details: [OPERATIONS.md](OPERATIONS.md).
+- **Historical status at the initial remediation release:** freshness monitoring and rollback rehearsal were not yet implemented. They were subsequently completed and verified as described in the Freshness & Recovery sections below. Still open: GitHub image-cache measurements and public restricted-metadata policy. Operator details: [OPERATIONS.md](OPERATIONS.md).
 
 ## Chart design decision (2026-10-10)
 
@@ -212,6 +212,10 @@ Implementation merged in [PR #2](https://github.com/dturovskiy/deus-commit-chart
 - **Recovery:** `ci/rehearse-rollback.sh` creates an isolated bare Git remote, pushes two valid snapshots, rejects a deliberately corrupted candidate (test remote ref unchanged), then restores the older release as a new forward-only commit. It checks restored manifest and all four assets byte-for-byte.
 - **Verification:** [Smoke 38086628526](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38086628526) **SUCCESS**, 27 tests passed, checksum rejection and rollback PASS in logs; [real GraphQL build 38086631846](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38086631846) **SUCCESS**, production publish SKIPPED on the feature branch.
 - **Still open:** GitHub README image-proxy lag measurement and separate public private/restricted metadata policy. The chart publisher and health monitor do not alter GitHub's contribution calculation semantics.
+
+## Freshness & Recovery production proof (2026-10-10)
+
+The implementation was reviewed and merged via [PR #3](https://github.com/dturovskiy/deus-commit-chart/pull/3), source commit `de1b8c8`. [Publish 38086821217](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38086821217) and [Smoke 38086821198](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38086821198) were both successful. The [production freshness monitor 38086854207](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38086854207) independently verified published artifacts and reported `healthy`, with snapshot age ~30 seconds against the 8-hour limit. The monitor uses the actual published branch rather than raw README image proxies. A real notification-delivery incident has not been deliberately triggered, and image-cache latency is still unmeasured.
 
 ## 10. Evidence and source paths
 

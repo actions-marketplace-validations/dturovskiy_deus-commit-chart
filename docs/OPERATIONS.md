@@ -62,6 +62,25 @@ git push origin HEAD:refs/heads/activity-assets
 
 After any rollback, inspect `manifest.json`, HTML and SVG on the remote branch, and check the profile. Automated scheduled publishes may replace the rollback later; resolve the triggering defect or temporarily disable that schedule through authorized repository operations.
 
+## Verified recovery rehearsal (2026-10-10)
+
+The [Smoke CI run 38086628526](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38086628526) passed **27 Node regression tests**, including API 401/403/429/503 cases, timeouts, malformed responses, incomplete calendar and freshness thresholds. The simulated isolated bare Git remote yielded:
+
+- Corrupt third candidate: `Asset checksum mismatch: activity-30d.svg`; **ref unchanged**.
+- Original verified snapshot commit: `bb98c1042573e9746cede84436891897b8402825`.
+- Second verified snapshot commit: `d0d03fc24aa594a9aba8c1c02e2a7a2424a5c29a`.
+- New forward-only restored commit: `7f8d81c16eea8018796982030ad85b2df1f84e1d`.
+- Manifest and all four restored assets matched the original byte-for-byte.
+- No production branch was touched; this is a **release-path rehearsal** and not a live disaster rollback.
+
+[Real GraphQL branch build 38086631846](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38086631846) succeeded, with production publish correctly skipped. The monitor's incident creation/closure will be verified independently of production failure injection; issue creation requires notification preferences for actual delivery.
+
+## Production monitoring validation (2026-10-10)
+
+- [PR #3](https://github.com/dturovskiy/deus-commit-chart/pull/3) merged as `de1b8c8`. [Publish 38086821217](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38086821217) and [Smoke 38086821198](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38086821198) both passed.
+- [Freshness monitor 38086854207](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38086854207) passed on `main` after the actual publish: reported `healthy`, age `0.008234h` (~30 sec), threshold 8h. Validated `index.html`, 30/90/365 SVG, hashes, numerical parity and XML.
+- The healthy run listed no open incident issue. Incident creation/closure and delivery under a **real production outage** remain unexercised; GitHub image-proxy caching remains out of scope for the manifest monitor.
+
 ## Source visibility and privacy
 
 GitHub contribution counts depend on the viewer token and GitHub account settings. A viewer with access to restricted/private contribution counts can produce different totals from an anonymous viewer. Do not publish a raw GraphQL response, token, repository names, issues or commit messages. The existing interactive report includes aggregate `restrictedContributionsCount`; whether to expose it publicly remains an explicit pending policy decision.
@@ -74,4 +93,4 @@ GitHub contribution counts depend on the viewer token and GitHub account setting
 - Snapshot: `abdaa5a4c4ee4194f8fea7ca90e875d871801d0722328e21272773ce9e29afa0`, `2026-10-10T20:21:46.111Z`.
 - Manifest ranges: 30d **206**, 90d **767**, 365d **3052**. Date 2026-10-10: **24** contributions at generation time.
 - Independent DEUS MCP `git show` checks confirmed that the published HTML and each 30/90/365 SVG agree with this manifest and that none of their stdout responses were truncated.
-- GitHub README image cache freshness and rollback rehearsal: **not verified**.
+- At the initial release, GitHub README image-cache freshness and rollback rehearsal were **not verified**. The rollback rehearsal was later completed in CI (see the verification section above); image-cache timing remains unverified.
