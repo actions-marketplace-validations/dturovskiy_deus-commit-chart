@@ -152,6 +152,12 @@
 - **First read-only cache observation:** [run 38088946652](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38088946652). Published generatedAt `2026-10-10T21:46:45.145Z`, observed `21:47:13.611536Z` (**28.47s** later), full snapshot `c62df1c12e738534be893db36a91865813f50ba2e2d0443778ed00e3825f86a9`. GitHub profile HTML exposed **raw.githubusercontent.com** image source; the direct raw asset and profile image URL matched the published snapshot. Both responses advertised `Cache-Control: max-age=300`. **No independent camo cache was observed.** This sample cannot establish an upper bound on browser/proxy invalidation. Classification was subsequently refined to avoid labelling a raw embed as a camo proxy.
 - **Not closed:** repeated longitudinal cache-lag measurements, physical device/browser visual review for narrow-screen readability, and actual browser/proxy cache behavior under a demonstrably stale image.
 
+## Corrected profile cache classification — production verification
+
+- [PR #6](https://github.com/dturovskiy/deus-commit-chart/pull/6) merged as `3c6f08037993e5734a8faf8b9e3c05b2062b5b3a`. [Smoke 38089180747](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38089180747) passed, including **4 offline cache classification tests**. [Publish 38089214515](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38089214515) succeeded.
+- [Real audit 38089253244](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38089253244) returned **`profile_raw_matched`**, `independentImageProxyObserved=false`, and `snapshotAgeAtProbeSeconds=36.77`. Published manifest snapshot `c149a3bfb6693f78e7f442f8d902bb2fdc683a2f4ad3eeb4a9396c519b77e70c`, `generatedAt=2026-10-10T21:51:30.309Z`, 30/90/365 totals **227/788/3073**. Raw/profile image matched; profile link host raw.githubusercontent.com, not camo; raw SVG `Cache-Control: max-age=300`.
+- **Do not close** DC-G2-12 / DC-G5-04 based only on these two successful raw-embed observations: no stale-to-fresh transition, cache invalidation upper bound, independent camo proxy observation, or manual device/browser image-cache inspection has been demonstrated.
+
 ## Evidence log (fill as work progresses)
 
 | Date / change | Finding or gate | Test / run / SHA / link | Result / notes |

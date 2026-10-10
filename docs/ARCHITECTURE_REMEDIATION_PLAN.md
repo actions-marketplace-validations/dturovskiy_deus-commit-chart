@@ -231,6 +231,10 @@ The implementation was reviewed and merged via [PR #3](https://github.com/dturov
 - The responsive HTML uses a full-width, horizontally scrollable SVG at narrow viewports with a keyboard-focusable region, newest day initially visible, explicit partial-today notice and theme contrast tests. Real-device visual QA is still pending.
 - [README cache sample 38088946652](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38088946652) at 2026-10-10 21:47:13.611536Z matched the published snapshot 28.47s after generation. Profile markup referenced **raw.githubusercontent.com**, and the raw SVG returned `Cache-Control: max-age=300`; this **does not prove camo image proxy or browser cache invalidation**. Repeated measurements remain required.
 
+## Corrected cache classification and second production observation
+
+[PR #6](https://github.com/dturovskiy/deus-commit-chart/pull/6) corrected the initial cache-probe classification after discovering that the rendered GitHub profile references **raw.githubusercontent.com** rather than a distinct camo URL. [Smoke 38089180747](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38089180747) and [production publish 38089214515](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38089214515) passed. [Read-only audit 38089253244](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38089253244) independently confirmed the published snapshot in the raw URL and HTML image source 36.77s after generation, reporting **`profile_raw_matched`** and `independentImageProxyObserved=false`. Response advertised `Cache-Control: max-age=300`. Two successful point-in-time raw observations do **not** establish an image/browser cache SLA or a maximum update delay. Physical device review and longitudinal cache measurements remain open.
+
 ## 10. Evidence and source paths
 
 - `generate-commit-chart.js:146-269,291-351,1048-1090` — adapters, series, CLI.

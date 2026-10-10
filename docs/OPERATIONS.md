@@ -32,6 +32,10 @@ On [2026-10-10 run 38088946652](https://github.com/dturovskiy/deus-commit-chart/
 
 The audit reports **`profile_raw_matched`** when GitHub emits a direct raw image link and that image has the latest snapshot. A **`proxy_matched`** or **`proxy_lag_observed`** classification requires an actual independent `camo.githubusercontent.com` URL. Continue to collect multiple scheduled samples after distinct publishes. Do not alert on an unobservable proxy or claim that a single matching sample establishes a strict SLA.
 
+## Corrected cache measurement evidence
+
+[PR #6](https://github.com/dturovskiy/deus-commit-chart/pull/6) prevents a profile raw URL from being reported as an independent camo proxy. After [production publish 38089214515](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38089214515), [probe 38089253244](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38089253244) reported `profile_raw_matched`, `independentImageProxyObserved=false`, snapshot age 36.77s. Production snapshot `c149a3bf...`, totals 227/788/3073. Continue sampling after future publishes; do not treat a raw `max-age=300` response as a camo/browser image-cache SLA.
+
 ## Freshness and recovery monitoring
 
 - `.github/workflows/monitor-freshness.yml` checks the real `activity-assets` branch on a two-hour offset schedule. The configured threshold is **8 hours** from `manifest.generatedAt` (allowing several missed publish windows).
