@@ -200,6 +200,10 @@ For readability in GitHub README and the interactive report, replace the green c
 
 This was verified on feature-branch smoke + live API builds. No image-generated preview is considered release evidence. Code and SVG/HTML output are the source of truth.
 
+## Combined chart production evidence
+
+Implementation merged in [PR #2](https://github.com/dturovskiy/deus-commit-chart/pull/2) as `dad9f87`. [Production publish 38085355727](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38085355727) and [main smoke 38085355677](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38085355677) passed. Remote `activity-assets` has verified snapshot `182029efbeebcacae06114868c322dd621f385ccd1128fdd4814b514012c1546`. All published 30/90/365 SVGs now use positive-count green bars and one smooth blue 7-day trend line; interactive HTML uses the same snapshot. GitHub image-cache lag still requires measurement.
+
 ## 10. Evidence and source paths
 
 - `generate-commit-chart.js:146-269,291-351,1048-1090` — adapters, series, CLI.

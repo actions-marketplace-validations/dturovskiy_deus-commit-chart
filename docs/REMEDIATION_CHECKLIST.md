@@ -111,6 +111,14 @@
 - Verified artifact `97f23f36273600aca81d714ae2c1c224d0dece6ba94d7dce4fe590c167d0884f`: 30d **30 bars**, 90d **89 bars** (one zero day), 365d **293 bars** (remaining days are zero); **one 7-day trend path in each**, no legacy daily curve or filled area. Totals at that moment: 210/771/3056.
 - Shared `dailyBarRects()` and `smoothPath()` are used by both static SVG and browser HTML. Bar hit-testing uses day-bin centers. Responsive visual inspection remains open; no visual QA checkbox is inferred from passing unit tests alone.
 
+## Combo chart production verification (2026-10-10)
+
+- [PR #2](https://github.com/dturovskiy/deus-commit-chart/pull/2) merged as `dad9f87308b177acf842e65be6c619862fe27869`.
+- [Production build + publish 38085355727](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38085355727): SUCCESS for both jobs; [main smoke 38085355677](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38085355677): SUCCESS.
+- `activity-assets` updated to `042b73d`. Manifest snapshot `182029efbeebcacae06114868c322dd621f385ccd1128fdd4814b514012c1546` (2026-10-10T20:51:11.180Z). Totals: 30d=212, 90d=773, 365d=3058.
+- Inspected **published** SVG and HTML via DEUS MCP `git show`: static 30d has 30 bars, 90d 89 bars, 365d 293 bars; each has exactly one 7d trend path, no former daily path or area. Interactive HTML embeds same snapshot ID and totals.
+- Production files are verified; GitHub README proxy cache freshness remains a separate, open measurement task. No claim that every screenshot has refreshed instantly.
+
 ## Evidence log (fill as work progresses)
 
 | Date / change | Finding or gate | Test / run / SHA / link | Result / notes |
