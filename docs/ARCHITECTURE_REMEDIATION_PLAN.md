@@ -1,6 +1,6 @@
 # Deus Commit Chart — Architecture Remediation Plan
 
-> Status: **implementation in progress / pending CI verification**
+> Status: **initial P0/P1 remediation released to production; follow-up gates remain open**
 > Date: **2026-10-10**
 > Repository: `dturovskiy/deus-commit-chart` (`main`)
 > Companion execution checklist: [REMEDIATION_CHECKLIST.md](REMEDIATION_CHECKLIST.md)
@@ -191,7 +191,8 @@ All gates in [REMEDIATION_CHECKLIST.md](REMEDIATION_CHECKLIST.md) are complete w
 - [Smoke CI 38083046571](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38083046571) passed on the updated code including browser VM execution and a partial-week GraphQL fixture.
 - DEUS MCP project runtime reports `package_manager_binary_missing`; Node validation was performed on a GitHub Actions Node 22 runner dispatched and examined **only through DEUS MCP**.
 - **Additional verified CI:** [Smoke 38083228821](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38083228821) and [real GraphQL build 38083244351](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38083244351) both succeeded on commit `b9af864`, including standalone Python-standard-library XML validation for all three SVGs. [Draft PR #1](https://github.com/dturovskiy/deus-commit-chart/pull/1) is mergeable; PR smoke check succeeded.
-- **Still open:** freshness alerts and cache observability, public privacy metadata policy, rollback rehearsal, production deployment and post-deploy README inspection.
+- **Production verified:** [PR #1](https://github.com/dturovskiy/deus-commit-chart/pull/1) merged as `7a76e17`. [Publish 38083440184](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38083440184) and [Smoke 38083440198](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38083440198) both SUCCESS. `activity-assets` now at `766cafd` with parent `b530710` (forward history; not force-pushed). Independent DEUS MCP `git show` confirmed a published HTML and all 30/90/365 SVGs agree with manifest snapshot `abdaa5a4c4ee4194f8fea7ca90e875d871801d0722328e21272773ce9e29afa0` (2026-10-10T20:21:46.111Z); totals 206/767/3052, 2026-10-10=24 at snapshot time.
+- **Still open:** freshness alerts and cache observability, public privacy metadata policy, rollback rehearsal and direct README image-cache inspection. Operator details: [OPERATIONS.md](OPERATIONS.md).
 
 ## 10. Evidence and source paths
 

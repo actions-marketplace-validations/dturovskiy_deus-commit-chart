@@ -1,6 +1,6 @@
 # Deus Commit Chart — Remediation Checklist
 
-> Status: **implementation in progress — CI-verified data/build fixes, production release still pending**. Mark an item only with evidence.
+> Status: **initial P0/P1 remediation shipped to main/activity-assets on 2026-10-10; remaining gates open**. Mark an item only with evidence.
 > Plan and rationale: [ARCHITECTURE_REMEDIATION_PLAN.md](ARCHITECTURE_REMEDIATION_PLAN.md).
 > Repository: `dturovskiy/deus-commit-chart`. No effort estimates or deadlines.
 >
@@ -83,7 +83,7 @@
 
 - [ ] **DC-G5-01** Record design decisions on freshness SLA, visibility, time-zone semantics, chart style and publication strategy in the plan or an ADR.
 - [ ] **DC-G5-02** Verify one candidate build against a known API response captured with the intended token at the same observation time.
-- [ ] **DC-G5-03** Verify the published HTML + three SVGs all match the candidate manifest and snapshot ID.
+- [x] **DC-G5-03** Verify the published HTML + three SVGs all match the candidate manifest and snapshot ID.
 - [ ] **DC-G5-04** Inspect actual README image after publish; record any remaining GitHub caching lag.
 - [ ] **DC-G5-05** Review Action permissions, error handling, public-output privacy and compatibility.
 - [ ] **DC-G5-06** Update README/CLI/Action docs, troubleshooting runbook and release notes.
@@ -117,7 +117,9 @@
 | 2026-10-10 host | Gate 0 | DEUS MCP `task_recipe_availability` | Host lacks package manager; GitHub Actions Node 22 is the reproducible test runner triggered via DEUS MCP. |
 | 2026-10-10 CI XML | DC-G2-05 | [Smoke 38083228821](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38083228821), [GraphQL build 38083244351](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38083244351) | Both passed standalone standard-library XML parsing, executable/external resource exclusions, checksum verifier and all ranges. |
 | 2026-10-10 PR | Deployment review | [Draft PR #1](https://github.com/dturovskiy/deus-commit-chart/pull/1) | Created using DEUS MCP GitHub CLI, mergeable; PR smoke check SUCCESS. Branch production publish guard was SKIPPED during test run. |
-| — | Remaining open gates | This file | Cache measurements, freshness alerting, public metadata decision, rollback rehearsal and production post-deploy checks remain open. |
+| 2026-10-10 merged | Gate 5 release | [PR #1](https://github.com/dturovskiy/deus-commit-chart/pull/1), `main=7a76e17` | Merged via DEUS MCP gh CLI. Production [Publish 38083440184](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38083440184) and [Smoke 38083440198](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38083440198) both SUCCESS. |
+| 2026-10-10 prod proof | DC-G5-03 | `origin/activity-assets=766cafd`, `manifest.json`, `index.html`, 3 SVGs (DEUS MCP git fetch/show) | Snapshot `abdaa5a4c4ee4194f8fea7ca90e875d871801d0722328e21272773ce9e29afa0`, generated 20:21:46Z, current day 24, 30d=206, 90d=767, 365d=3052; manifest and all 4 outputs agreed; no output truncation. New branch commit parent `b530710`. |
+| — | Remaining open gates | [OPERATIONS.md](OPERATIONS.md) | Cache measurements, freshness alerting, public metadata decision, rollback rehearsal and real README image-cache inspection remain open. |
 | — | — | — | — |
 
 ## Working conventions

@@ -384,8 +384,9 @@ The architecture audit and remediation work are tracked inside this repository:
 
 - [Architecture Remediation Plan](docs/ARCHITECTURE_REMEDIATION_PLAN.md) — findings, evidence, target design, implementation gates, and acceptance criteria.
 - [Remediation Checklist](docs/REMEDIATION_CHECKLIST.md) — actionable verification tasks, release gates, and evidence log.
+- [Production Operations and Rollback](docs/OPERATIONS.md) — validation, incident response, release evidence and forward-only rollback.
 
-These are working documents: tasks remain open until supported by test or release evidence. No implementation or deployment is implied by their presence.
+Initial data-integrity and publishing fixes shipped on 2026-10-10; additional remediation items remain open until supported by test or release evidence.
 
 ## Development
 
