@@ -7,6 +7,7 @@ const path = require('node:path');
 const { createHash } = require('node:crypto');
 const { readGithubDailyCounts, readLocalGitDailyCounts, buildSeries, selectRange, createMeta } = require('./generate-commit-chart');
 const { renderModernHtml, renderModernSvg } = require('./modern-renderer');
+const { validateContributionSeries } = require('./chart-contract');
 
 const ALLOWED_RANGES = [30, 90, 365];
 const DEFAULTS = {
@@ -62,6 +63,7 @@ function createAssetBundle(sourceData, opts = {}) {
     throw new Error('Expected complete 365-day GitHub contribution data');
   }
   const meta = createMeta({ days: options.defaultDays }, sourceData, data);
+  validateContributionSeries(data, meta);
   const renderOptions = {
     theme: options.theme, layout: options.layout, hideBorder: options.hideBorder,
     width: options.width || undefined, height: options.height || undefined
@@ -81,7 +83,7 @@ function createAssetBundle(sourceData, opts = {}) {
     const name = 'activity-' + days + 'd.svg';
     const svg = renderModernSvg(options.title, '', meta, data, days, renderOptions);
     if (!svg.startsWith('<svg ') || /<script\b|<foreignObject\b|NaN|Infinity|href\s*=\s*["']https?:/i.test(svg) ||
-        !svg.includes(days + ' days · ' + total + ' contributions') ||
+        !svg.includes(days + ' days · ' + total + ' ' + (meta.source === 'local' ? 'commits' : 'contributions')) ||
         !svg.includes('Snapshot ' + meta.snapshotId.slice(0, 10))) {
       throw new Error('SVG validation failed for ' + name);
     }

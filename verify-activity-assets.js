@@ -6,6 +6,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { createHash } = require('node:crypto');
 const { selectRange } = require('./generate-commit-chart');
+const { validateContributionSeries } = require('./chart-contract');
 
 function verifyDirectory(dir) {
   const root = path.resolve(dir);
@@ -50,6 +51,7 @@ function verifyDirectory(dir) {
   if (!['github', 'local'].includes(payload.meta.source)) {
     throw new Error('Unexpected chart source');
   }
+  validateContributionSeries(payload.data, payload.meta);
   if (payload.meta.snapshotId !== manifest.snapshotId ||
       payload.meta.generatedAt !== manifest.generatedAt ||
       payload.data[0]?.date !== manifest.rangeStart ||
@@ -61,7 +63,7 @@ function verifyDirectory(dir) {
     const svg = fs.readFileSync(path.join(root, 'activity-' + days + 'd.svg'), 'utf8');
     if (total !== range.total || data[0]?.date !== range.startDate ||
       data.at(-1)?.date !== range.endDate ||
-      !svg.startsWith('<svg ') || !svg.includes(days + ' days · ' + total + ' contributions') ||
+      !svg.startsWith('<svg ') || !svg.includes(days + ' days · ' + total + ' ' + (payload.meta.source === 'local' ? 'commits' : 'contributions')) ||
       !svg.includes('Snapshot ' + manifest.snapshotId.slice(0, 10)) ||
       /<script\b|<foreignObject\b|NaN|Infinity|href\s*=\s*["']https?:/i.test(svg)) {
       throw new Error('SVG numerical/integrity failure: ' + days + 'd');

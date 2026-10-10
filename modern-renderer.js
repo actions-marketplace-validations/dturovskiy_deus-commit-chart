@@ -246,7 +246,8 @@ function renderModernSvg(title, description, meta, allData, days, options = {}) 
     ? `@${meta.username || ''}`
     : `${meta.repo || 'repository'} · ${meta.branch || 'ref'}`;
   const rangeLabel = first && last ? `${formatDate(first.date, true)} → ${formatDate(last.date, true)}` : `${days}d`;
-  const descriptionText = description || `${total} contributions across ${activeDays} active days in the last ${days} days.`;
+  const activityUnit = meta.source === 'local' ? 'commits' : 'contributions';
+  const descriptionText = description || `${total} ${activityUnit} across ${activeDays} active days in the last ${days} days.`;
   const border = options.hideBorder ? 'none' : theme.border;
   const grid = [];
   const gridLines = 3;
@@ -262,7 +263,7 @@ function renderModernSvg(title, description, meta, allData, days, options = {}) 
     ? `<rect data-series="daily" x="${bar.x}" y="${bar.y}" width="${bar.width}" height="${bar.height}" rx="${bar.radius}" fill="${index === bars.length - 1 && meta.currentDayPartial ? theme.glow : theme.daily}" opacity="${index === bars.length - 1 ? 1 : 0.82}"/>`
     : '').filter(Boolean).join('\n    ');
   const stamp = meta.generatedAt ? new Date(meta.generatedAt).toISOString().slice(0, 16).replace('T', ' ') + ' UTC' : 'unknown';
-  const statLine = `${days} days · ${total} contributions · ${activeDays} active days${peak ? ` · peak ${peak.commits}` : ''} · Updated ${stamp} · Snapshot ${(meta.snapshotId || 'legacy').slice(0, 10)}`;
+  const statLine = `${days} days · ${total} ${activityUnit} · ${activeDays} active days${peak ? ` · peak ${peak.commits}` : ''} · Updated ${stamp}${meta.currentDayPartial ? ' · Today partial' : ''} · Snapshot ${(meta.snapshotId || 'legacy').slice(0, 10)}`;
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${layout.width}" height="${layout.height}" viewBox="0 0 ${layout.width} ${layout.height}" role="img" aria-labelledby="chart-title chart-desc">
   <title id="chart-title">${escapeXml(title)}</title>
@@ -330,18 +331,20 @@ function renderModernHtml(title, description, meta, allData, options = {}) {
     .stat { background:#0d1117; padding:15px 18px; min-height:78px; }
     .stat span { display:block; color:var(--muted); font-size:11px; }
     .stat strong { display:block; margin-top:5px; font-size:20px; letter-spacing:-.03em; }
-    .chart-wrap { position:relative; padding:18px; background:linear-gradient(180deg,#0d1117,#0a0e14); }
+    .chart-wrap { position:relative; padding:18px; background:linear-gradient(180deg,#0d1117,#0a0e14); overflow-x:auto; overscroll-behavior-x:contain; }
     #chart { width:100%; height:auto; min-height:300px; display:block; border-radius:18px; }
     .foot { display:flex; justify-content:space-between; gap:18px; align-items:center; padding:14px 24px 18px; color:var(--muted); font-size:12px; border-top:1px solid rgba(48,54,61,.55); }
     .legend { display:flex; gap:16px; flex-wrap:wrap; }
     .legend span { display:inline-flex; align-items:center; gap:7px; }
     .swatch { width:16px; height:9px; background:var(--green); border-radius:2px; }
     .swatch.trend { width:25px; height:0; background:transparent; border-top:2px solid var(--blue); border-radius:999px; opacity:.94; }
+    .scroll-hint { display:none; margin:0; padding:10px 14px 0; color:var(--muted); font-size:12px; }
+    .chart-wrap:focus-visible { outline:2px solid var(--blue); outline-offset:-3px; }
     .tooltip { position:fixed; display:none; pointer-events:none; transform:translate(-50%,-118%); z-index:10; min-width:190px; padding:11px 12px; border:1px solid var(--line-2); border-radius:13px; background:rgba(5,8,13,.96); box-shadow:0 18px 60px rgba(0,0,0,.55); }
     .tooltip strong { display:block; margin-bottom:7px; }
     .tip-row { display:flex; justify-content:space-between; gap:18px; color:var(--muted); margin-top:4px; font-size:12px; }
     .tip-row b { color:var(--text); }
-    @media(max-width:820px){ .head{display:block}.controls{justify-content:flex-start;margin-top:16px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.foot{display:block}.legend{margin-bottom:8px} }
+    @media(max-width:820px){ .head{display:block}.controls{justify-content:flex-start;margin-top:16px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.foot{display:block}.legend{margin-bottom:8px} #chart{min-width:${layout.width}px;min-height:0} .scroll-hint{display:block} }
     @media(max-width:520px){ main{width:min(100vw - 16px,1240px);padding-top:8px}.shell{border-radius:18px}.head{padding:20px 18px 16px}.stats{grid-template-columns:1fr 1fr}.stat{padding:13px}.chart-wrap{padding:8px}.stamp{display:none} }
   </style>
 </head>
@@ -364,17 +367,18 @@ function renderModernHtml(title, description, meta, allData, options = {}) {
         </div>
       </header>
       <div class="stats">
-        <div class="stat"><span>Contributions</span><strong id="stat-total">—</strong></div>
+        <div class="stat"><span id="stat-total-label">Contributions</span><strong id="stat-total">—</strong></div>
         <div class="stat"><span>Active days</span><strong id="stat-active">—</strong></div>
         <div class="stat"><span>Peak day</span><strong id="stat-peak">—</strong></div>
         <div class="stat"><span>Data freshness</span><strong id="stat-fresh">—</strong></div>
       </div>
-      <div class="chart-wrap">
+      <p class="scroll-hint" id="chart-scroll-hint">Swipe sideways to view all days; the newest day is on the right.</p>
+      <div class="chart-wrap" id="chart-scroll" role="region" aria-label="Scrollable daily contribution chart" aria-describedby="chart-scroll-hint" tabindex="0">
         <svg id="chart" viewBox="0 0 ${layout.width} ${layout.height}" role="img" aria-label="Contribution activity chart"></svg>
       </div>
       <footer class="foot">
         <div class="legend"><span><i class="swatch"></i>Daily activity</span><span><i class="swatch trend"></i>7d trend</span></div>
-        <div><span id="privacy-note"></span> Range switches rebuild the SVG in-browser from the embedded 365-day dataset; no API request is made on click.</div>
+        <div><span id="privacy-note"></span> Today's count is incomplete. Range switches rebuild the SVG in-browser from embedded data without API requests.</div>
       </footer>
     </section>
   </main>
@@ -385,6 +389,7 @@ function renderModernHtml(title, description, meta, allData, options = {}) {
     const payload = JSON.parse(document.getElementById('chart-data').textContent);
     const allData = payload.data || [];
     const meta = payload.meta || {};
+    const activityUnit = meta.source === 'local' ? 'commits' : 'contributions';
     const theme = payload.theme;
     const layout = payload.layout;
     const chart = document.getElementById('chart');
@@ -454,9 +459,10 @@ function renderModernHtml(title, description, meta, allData, options = {}) {
         '<g font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">'+
         '<text x="'+g.pad.left+'" y="34" fill="'+theme.text+'" font-size="'+layout.titleSize+'" font-weight="700">'+esc(payload.title)+'</text>'+
         '<text x="'+g.pad.left+'" y="58" fill="'+theme.muted+'" font-size="'+layout.metaSize+'">'+esc((meta.source==='github'?'@'+(meta.username||''):((meta.repo||'repository')+' · '+(meta.branch||'ref'))))+' · '+esc(first&&last?(fmtDate(first.date,true)+' → '+fmtDate(last.date,true)):(selectedDays+'d'))+'</text>'+
-        '<text x="'+g.pad.left+'" y="78" fill="'+theme.muted+'" font-size="'+layout.metaSize+'">'+selectedDays+' days · '+fmtNum(total)+' contributions · '+active+' active days'+(peak?' · peak '+peak.commits:'')+'</text>'+
+        '<text x="'+g.pad.left+'" y="78" fill="'+theme.muted+'" font-size="'+layout.metaSize+'">'+selectedDays+' days · '+fmtNum(total)+' '+activityUnit+' · '+active+' active days'+(peak?' · peak '+peak.commits:'')+'</text>'+
         '<g transform="translate('+(g.width-g.pad.right-182)+',30)" font-size="'+layout.metaSize+'" fill="'+theme.muted+'"><rect x="3" y="-5" width="17" height="8" rx="2" fill="'+theme.daily+'"/><text x="33" y="4">Daily</text><line x1="92" y1="0" x2="117" y2="0" stroke="'+theme.trend+'" stroke-width="2" stroke-linecap="round" opacity=".92"/><text x="125" y="4">7d trend</text></g>'+
         grid.join('')+'<g data-chart-series="daily-bars">'+bars+'</g>'+(g.trendPath?'<path data-series="trend" d="'+g.trendPath+'" fill="none" stroke="'+theme.trend+'" stroke-width="'+Math.max(2,layout.trendStroke)+'" stroke-linejoin="round" stroke-linecap="round" opacity=".94"/>':'')+labels.join('')+'</g>';
+      document.getElementById('stat-total-label').textContent=meta.source==='local'?'Commits':'Contributions';
       document.getElementById('stat-total').textContent=fmtNum(total);
       document.getElementById('stat-active').textContent=active+' / '+visible.length;
       document.getElementById('stat-peak').textContent=peak?(peak.commits+' · '+fmtDate(peak.date,false)):'—';
@@ -477,6 +483,11 @@ function renderModernHtml(title, description, meta, allData, options = {}) {
       history.replaceState(null,'','#'+days+'d');
       tooltip.style.display='none';
       render();
+      // Keep the newest observations initially visible in a narrow, scrollable chart.
+      if (typeof window !== 'undefined' && window.innerWidth <= 820) {
+        const scroller=document.getElementById('chart-scroll');
+        if (scroller) scroller.scrollLeft=scroller.scrollWidth;
+      }
     }
 
     chart.addEventListener('pointermove',(evt)=>{
