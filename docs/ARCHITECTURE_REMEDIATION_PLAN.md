@@ -243,6 +243,10 @@ Renderer `selectRange`, `chartGeometry`, `dailyBarRects`, `smoothPath`, date hel
 
 GitHub API errors now carry stable categories and bounded attempt/status metadata; permanent schema/auth failures fail immediately while timeout, transport, 429 and 5xx use bounded retries. [Smoke 38094293267](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38094293267) passed 49 Node and 4 Python tests, composite Action and rollback. [Real GraphQL build 38094296015](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38094296015) passed on the review branch; publishing there was skipped. See [SOURCE_AND_RENDER_ARCHITECTURE.md](SOURCE_AND_RENDER_ARCHITECTURE.md) for the module boundary, source contract, and error taxonomy.
 
+## Source/refactor production proof and security review (2026-10-11)
+
+[PR #7](https://github.com/dturovskiy/deus-commit-chart/pull/7) merged as `ab272c1`. [Main smoke 38094426657](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38094426657), [production publish 38094426663](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38094426663), and [post-deploy health 38094479108](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38094479108) all passed. Remote manifest, HTML and static SVG verified from `activity-assets`: snapshot `5e236808b8452d099416b06c3ab71e391457610690be0118f7dfe1b909dc61f6`, published 30d=228, 90d=789, 365d=3074. Source adapter boundaries and browser/static rendering functions are now unified as described in [SOURCE_AND_RENDER_ARCHITECTURE.md](SOURCE_AND_RENDER_ARCHITECTURE.md). Permission and compatibility assessment is documented in [CI_ACTION_SECURITY_REVIEW.md](CI_ACTION_SECURITY_REVIEW.md). **Remaining P2 risk:** upstream GitHub Actions version tags are not SHA pinned.
+
 ## 10. Evidence and source paths
 
 - `generate-commit-chart.js:146-269,291-351,1048-1090` — adapters, series, CLI.

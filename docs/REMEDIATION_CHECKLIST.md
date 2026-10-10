@@ -85,7 +85,7 @@
 - [ ] **DC-G5-02** Verify one candidate build against a known API response captured with the intended token at the same observation time.
 - [x] **DC-G5-03** Verify the published HTML + three SVGs all match the candidate manifest and snapshot ID.
 - [ ] **DC-G5-04** Inspect actual README image after publish; record any remaining GitHub caching lag.
-- [ ] **DC-G5-05** Review Action permissions, error handling, public-output privacy and compatibility.
+- [x] **DC-G5-05** Review Action permissions, error handling, public-output privacy and compatibility. (docs/CI_ACTION_SECURITY_REVIEW.md; smoke 38094293267, published build 38094426663. Upstream Action SHA pinning remains OPEN as separate P2 hardening.)
 - [ ] **DC-G5-06** Update README/CLI/Action docs, troubleshooting runbook and release notes.
 - [x] **DC-G5-07** Save the tested rollback command/process and prove it restores a known-good manifest. (ci/rehearse-rollback.sh, docs/OPERATIONS.md, smoke CI run 38086628526.)
 - [ ] **DC-G5-08** Close finding IDs **DC-01–DC-15** only with linked evidence, explicit mitigation or accepted risk.
@@ -166,6 +166,14 @@
 - Browser HTML now embeds the canonical renderer's `selectRange`, `chartGeometry`, `smoothPath`, `dailyBarRects`, `buildTicks` and date helpers. The browser execution test compares exact bars, blue trend path and tick text against static SVG for 30/90/365 days.
 - GitHub HTTP/auth/rate-limit/server/GraphQL/JSON/network/timeout errors have stable classifications with bounded retry behavior; actual malformed live API conditions are not deliberately injected into production.
 - Architectural contract documented in [SOURCE_AND_RENDER_ARCHITECTURE.md](SOURCE_AND_RENDER_ARCHITECTURE.md). **DC-G3-01 remains partially open:** independent metric helpers and end-to-end tick policy need further explicit extraction/tests. No visual redesign or browser mobile changes.
+
+## Source/render architecture — production verification (2026-10-11)
+
+- [PR #7](https://github.com/dturovskiy/deus-commit-chart/pull/7) merged as `ab272c1d50e72e7bce01b3609100399fbdb7936e`.
+- [Main smoke 38094426657](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38094426657) **SUCCESS**. [Production publish 38094426663](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38094426663): build and publish both **SUCCESS**; [post-deploy health 38094479108](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38094479108) **SUCCESS**.
+- Published `activity-assets` manifest: `sourceCommit=ab272c1`, `workflowRun=38094426663`, snapshot `5e236808b8452d099416b06c3ab71e391457610690be0118f7dfe1b909dc61f6`, generated `2026-10-10T23:16:12.605Z`, 30d=228, 90d=789, 365d=3074. Checked `manifest.json`, `index.html` and 30d SVG directly from the remote with no truncated responses. HTML uses canonical pure renderer functions and the published SVG has daily bars and one trend path.
+- [CI/Action security review](CI_ACTION_SECURITY_REVIEW.md) confirms read/write credential separation, branch guard, checksum and XML checks, offline local Action compatibility, error taxonomy and privacy. **Residual P2:** upstream `actions/*@v4` dependencies are major-tag-based, not SHA-pinned.
+- **Still open:** full G3-01 extraction of metrics/tick policy into a separate, independently tested pure package, longitudinal GitHub cache measurements and real-browser visual QA. Do not mark these complete based solely on this refactor.
 
 ## Evidence log (fill as work progresses)
 
