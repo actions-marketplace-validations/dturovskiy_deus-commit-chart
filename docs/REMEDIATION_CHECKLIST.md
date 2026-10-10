@@ -29,7 +29,7 @@
 - [ ] **DC-G1-08** Distinguish GitHub `contributions` from local `commits`; retain any documented compatibility aliases.
 - [ ] **DC-G1-09** Explicitly identify incomplete current-day data without reassigning GitHub's recorded calendar dates.
 - [x] **DC-G1-10** Create deterministic serialized fixture/snapshot and prove offline repeatability.
-- [ ] **DC-G1-11** Review metadata exposed through public HTML/SVG, including restricted/private aggregate fields; no token/private repository names in output.
+- [x] **DC-G1-11** Review metadata exposed through public HTML/SVG, including restricted/private aggregate fields; no token/private repository names in output. (Public-data policy daily-aggregates-only-v1; production PR #4 and run 38087609571 verified; history limitations documented.)
 
 **Gate 1 exit:** one source snapshot, complete data validation, shared identity for HTML and 30/90/365 outputs.
 
@@ -101,7 +101,7 @@
 - [ ] Correct values are independently verified, not inferred from a pretty curve or green CI badge.
 - [ ] Errors cannot overwrite the last verified release; rollback has been rehearsed.
 - [ ] README SVG remains valid without JS; HTML is self-contained; local Git mode is offline.
-- [ ] Security/privacy boundary and source-visibility assumptions are documented.
+- [x] Security/privacy boundary and source-visibility assumptions are documented. (PR #4, README/PRIVACY.md/SECURITY.md/OPERATIONS.md; historical artifacts may still contain prior metadata.)
 - [ ] All completion checkmarks have actual evidence links or attached test logs.
 
 ## Combo chart review evidence (2026-10-10)
@@ -133,6 +133,15 @@
 - [Real health monitor 38086854207](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38086854207) **SUCCESS**: verified published manifest + all four artifact checksums and numerical totals + three SVG XML files; snapshot `f802e610b1d2d6abac963700adc140672c9c250b48ff0f29e9abda173f361195`, generated `2026-10-10T21:14:08.878Z`, age `0.00823h` (approx. 30s) at the check, threshold 8h.
 - GitHub Issues are enabled and no open issues existed at healthy-run time. Actual incident-creation/notification on a production failure was **not intentionally triggered**.
 - QA only: [branch smoke 38086628526](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38086628526) proved corrupt candidate rejected without test-remote ref mutation and full forward-only manifest/asset restoration. GitHub image-proxy freshness remains an independent open task.
+
+## Public chart privacy audit — production evidence (2026-10-10)
+
+- [PR #4](https://github.com/dturovskiy/deus-commit-chart/pull/4) merged as `20e065eee7e71b0a04b4030d90832d71ba6b9d99`; [production publish 38087609571](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38087609571) **SUCCESS**; [main smoke 38087609597](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38087609597) **SUCCESS**.
+- [Branch smoke 38087484385](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38087484385): **31/31 tests passed**; includes GraphQL private-field absence, redacted HTML/SVG/manifest fixtures, a malicious public-metadata injection with a recomputed checksum rejected by the verifier, and rollback rehearsal.
+- [Real GraphQL canary build 38087488714](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38087488714): **SUCCESS** with publish skipped. Artifact meta contained only explicitly allowed keys, never `restrictedContributionsCount`, `hasAnyRestrictedContributions`, or `totalCommitContributions`.
+- Production `activity-assets` manifest: policy `daily-aggregates-only-v1`, snapshot `809d1f6975f7a37866ecf83a824fce742b437e6a6fd305b4ea7caec83eca9a10`, generated `2026-10-10T21:26:13.288Z`, ranges **219/780/3065** contributions. Published HTML and all three SVGs are free of the restricted-count metadata; the HTML preserves 365 daily values, including **37** for Oct 10 at that timestamp.
+- [Production freshness monitor 38087690459](https://github.com/dturovskiy/deus-commit-chart/actions/runs/38087690459): **SUCCESS** against this release.
+- **Privacy limitation:** chart daily aggregates may include token-visible private activity. Historical Git objects, GitHub Actions artifacts, forks, and image caches can retain older metadata; no destructive history rewrite was attempted.
 
 ## Evidence log (fill as work progresses)
 

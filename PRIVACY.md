@@ -1,6 +1,6 @@
 # Privacy Notice
 
-Effective date: 2026-09-01
+Effective date: 2026-09-01; last updated: 2026-10-10 (public chart data-minimization policy).
 
 This Privacy Notice describes how Deus Commit Chart handles data when used as a local command-line tool or as a GitHub Action.
 
