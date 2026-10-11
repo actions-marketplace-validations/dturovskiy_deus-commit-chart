@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.5.2
+
+- Strengthen regression assurance without changing the published Action input/output contract: full GitHub GraphQL success/failure fixtures, deterministic SVG golden hashes, and an independent captured-live-API-to-candidate check of all 365 contribution days and 30/90/365 totals.
+- Introduce an immutable internal `ContributionSnapshot` with validated provenance and share daily counts, trailing seven-day averages and chart geometry between HTML and SVG.
+- Validate the generated standalone HTML in real Chromium on PR-only CI: controls, tooltip, keyboard navigation, 390px mobile scrolling, all three ranges and both supported themes. No extra scheduled CI jobs or external runtime dependencies.
+- Improve maintainer-only operations: configurable **manual** freshness diagnostics, non-scheduled read-only multi-sample README cache audits and evidence-backed prioritized technical-debt/visual-review registers. These diagnostic workflows do **not** run when someone installs the Marketplace Action.
+- Keep strict validated publication, fast-forward-only `activity-assets` history, current public-data minimization, no embedded credentials and the prior generation-only consumer contract. The maintainer publisher now disables checkout credential persistence and uses a step-local, ephemeral GitHub credential helper for the final write; job-wide `contents: write` and GraphQL fallback privileges remain a documented accepted residual (not strict least privilege).
+- **Existing signed `@v1` alias still resolves to legacy v1.4.1** until a separately approved compatible signed transition. Pin `@v1.5.2` only after its exact release is published and verified; G3-08 was accepted with a user-approved zoom-to-read static mobile embed plus real Chromium regression of the other ranges/themes, retaining wider-device QA under TD-12. Job privilege scope and GitHub-owned image-cache timing remain documented residual technical debt.
+
+
 ## 1.5.1
 
 - Refresh the GitHub Marketplace-facing README: accurate daily bars + 7-day trend, UTC local Git semantics, current release badge and explicit private-contribution aggregate disclosure.
