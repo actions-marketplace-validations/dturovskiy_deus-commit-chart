@@ -16,12 +16,13 @@ test('CI executes only for PRs targeting main, never push/schedule/dispatch', ()
   assert.match(header, /permissions:\n  contents: read/);
 });
 
-test('profile publisher has only one six-hour scheduled job and optional manual dispatch', () => {
+test('maintainer publisher refreshes on main push and best-effort cron plus manual dispatch', () => {
   const content = workflow('publish-pages.yml');
   const header = triggerSection(content);
-  assert.match(header, /cron: '17 \*\/6 \* \* \*'/);
+  assert.match(header, /cron: '11,26,41,56 \* \* \* \*'/);
+  assert.match(header, /\n  push:\n    branches: \[main\]/);
   assert.match(header, /\n  workflow_dispatch:/);
-  assert.doesNotMatch(header, /(?:\n  push:|\n  pull_request:)/);
+  assert.doesNotMatch(header, /\n  pull_request:/);
   assert.deepEqual([...content.split('\njobs:\n')[1].matchAll(/^  ([a-z][\w-]+):$/gm)].map(m => m[1]), ['publish']);
   assert.match(content, /if: github.ref == 'refs\/heads\/main'/);
   assert.match(content, /permissions:\n      contents: write/);
@@ -65,6 +66,15 @@ test('freshness check and README cache probe never run automatically or modify i
   assert.match(monitor, /FETCH_OUTCOME/);
   assert.match(monitor, /INTEGRITY_OUTCOME/);
   assert.match(monitor, /FRESHNESS_OUTCOME/);
+  assert.match(monitor, /actions: read/);
+  assert.match(monitor, /CHART_MAX_SCHEDULE_GAP_HOURS/);
+  assert.match(monitor, /gh api "repos\/\$\{GITHUB_REPOSITORY\}\/actions\/workflows\/publish-pages\.yml\/runs\?per_page=100"/);
+  assert.match(monitor, /node ci\/check-run-delivery\.js/);
+  assert.match(monitor, /SCHEDULE_OUTCOME/);
+  assert.match(monitor, /CHART_SCHEDULE_GAP_ADVISORY: 'true'/);
+  assert.match(monitor, /Schedule diagnostic execution/);
+  assert.match(monitor, /Schedule health: WARN/);
+  assert.match(monitor, /Schedule health: FAIL/);
 });
 
 test('Marketplace composite Action entry point remains unchanged in the runtime pipeline', () => {
@@ -136,6 +146,17 @@ test('tagged Marketplace consumer runs only on explicit dispatch and uses remote
   assert.match(content, /python3 ci\/validate-svg\.py/);
   assert.doesNotMatch(content, /upload-artifact|download-artifact|contents: write|git push/);
   assert.match(content, /actions\/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1/);
+});
+
+test('Marketplace release version and documented security support stay aligned', () => {
+  const security = fs.readFileSync(path.join(__dirname, '../SECURITY.md'), 'utf8');
+  assert.match(security, /supported released Action, \*\*v1\.5\.3\*\*/);
+  assert.doesNotMatch(security, /@v1\.5\.1|latest supported release, \*\*v1\.5\.1/);
+  const readme = fs.readFileSync(path.join(__dirname, '../README.md'), 'utf8');
+  assert.doesNotMatch(readme, /it still checks GitHub every six hours/);
+  assert.match(readme, /Pushes to other repositories do not invoke this publisher/);
+  const workflowContent = workflow('publish-pages.yml');
+  assert.match(triggerSection(workflowContent), /\n  push:\n    branches: \[main\]/);
 });
 
 test('the upcoming Marketplace release version is consistent in npm metadata', () => {
